@@ -42,10 +42,10 @@
       "inline": [
         "DEBIAN_FRONTEND=noninteractive apt-get -y upgrade",
         "echo \"deb https://packages.microsoft.com/repos/azure-cli/ wheezy main\" | sudo tee /etc/apt/sources.list.d/azure-cli.list",
-        "apt-key adv --keyserver packages.microsoft.com --recv-keys 417A0893",
+        "curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -",
         "apt-get update && apt-get install -y git azure-cli",
 
-        "/tmp/terraform-azurerm-nomad/modules/install-nomad/install-nomad --version {{user `nomad_version`}}",
+        "bash /tmp/terraform-azurerm-nomad/modules/install-nomad/install-nomad --version {{user `nomad_version`}}",
         "git clone --branch {{user `consul_module_version`}} https://github.com/bondido/terraform-azurerm-consul.git /tmp/terraform-azurerm-consul",
         "bash /tmp/terraform-azurerm-consul/modules/install-consul/install-consul --version {{user `consul_version`}}",
         "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
