@@ -97,7 +97,7 @@ resource "azurerm_lb_probe" "consul_ui_probe" {
 
 resource "azurerm_lb_rule" "consul_ui_port" {
   resource_group_name = "${var.resource_group_name}"
-  name = "nomad-api"
+  name = "consul-ui"
   loadbalancer_id = "${element(module.servers.load_balancer_id, 0)}"
   protocol = "Tcp"
   frontend_port = "8500"
