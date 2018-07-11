@@ -87,6 +87,25 @@ resource "azurerm_lb_rule" "nomad_api_port" {
   backend_address_pool_id = "${element(module.servers.backend_pool_id, 0)}"
   probe_id = "${azurerm_lb_probe.nomad_probe.id}"
 }
+  
+resource "azurerm_lb_probe" "consul_ui_probe" {
+  resource_group_name = "${var.resource_group_name}"
+  loadbalancer_id = "${element(module.servers.load_balancer_id, 0)}"
+  name                = "consului-running-probe"
+  port                = "8500"
+}
+
+resource "azurerm_lb_rule" "consul_ui_port" {
+  resource_group_name = "${var.resource_group_name}"
+  name = "nomad-api"
+  loadbalancer_id = "${element(module.servers.load_balancer_id, 0)}"
+  protocol = "Tcp"
+  frontend_port = "8500"
+  backend_port = "8500"
+  frontend_ip_configuration_name = "PublicIPAddress"
+  backend_address_pool_id = "${element(module.servers.backend_pool_id, 0)}"
+  probe_id = "${azurerm_lb_probe.consul_ui_probe.id}"
+}
 
 # ---------------------------------------------------------------------------------------------------------------------
 # THE CUSTOM DATA SCRIPT THAT WILL RUN ON EACH SERVER NODE WHEN IT'S BOOTING
