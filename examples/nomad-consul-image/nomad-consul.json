@@ -8,8 +8,8 @@
     "azure_location": "West Europe",
     "resource_group_name": null,
     "consul_module_version": "master",
-    "consul_version": "0.9.2",
-    "nomad_version": "0.6.3"
+    "consul_version": "1.2.0",
+    "nomad_version": "0.8.4"
   },
   "builders": [
     {
@@ -43,11 +43,11 @@
         "DEBIAN_FRONTEND=noninteractive apt-get -y upgrade",
         "echo \"deb https://packages.microsoft.com/repos/azure-cli/ wheezy main\" | sudo tee /etc/apt/sources.list.d/azure-cli.list",
         "curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -",
-        "apt-get update && apt-get install -y git azure-cli",
-
+        "apt-get update && apt-get install -y git azure-cli redis-tools",
         "bash /tmp/terraform-azurerm-nomad/modules/install-nomad/install-nomad --version {{user `nomad_version`}}",
         "git clone --branch {{user `consul_module_version`}} https://github.com/bondido/terraform-azurerm-consul.git /tmp/terraform-azurerm-consul",
         "bash /tmp/terraform-azurerm-consul/modules/install-consul/install-consul --version {{user `consul_version`}}",
+        "curl -fsSL https://get.docker.com | sh",
         "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
       ]
     }
