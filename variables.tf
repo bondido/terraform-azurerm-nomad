@@ -42,7 +42,7 @@ variable "key_data" {
 
 variable "location" {
   description = "The Azure region the consul cluster will be deployed in"
-  default = "East US"
+  default = "West Europe"
 }
 
 variable "allowed_ssh_cidr_blocks" {
@@ -78,7 +78,7 @@ variable "num_servers" {
 
 variable "num_clients" {
   description = "The number of client nodes to deploy. You can deploy as many as you need to run your jobs."
-  default     = 1
+  default     = 3
 }
 
 variable "cluster_tag_key" {
