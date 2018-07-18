@@ -136,7 +136,7 @@ module "clients" {
   source = "./modules/nomad-cluster"
 
   cluster_name = "${var.cluster_name}-clients"
-  cluster_size = "${var.num_servers}"
+  cluster_size = "${var.num_clients}"
   key_data = "${var.key_data}"
 
   # To make testing easier, we allow Consul and SSH requests from any IP address here but in a production
