@@ -6,7 +6,7 @@
     "client_id": "{{env `ARM_CLIENT_ID`}}",
     "client_secret": "{{env `ARM_CLIENT_SECRET`}}",
     "azure_location": "West Europe",
-    "resource_group_name": null,
+    "resource_group_name": "{{env `ARM_RESOURCE_GROUP`}}",
     "consul_module_version": "master",
     "consul_version": "1.2.0",
     "nomad_version": "0.8.4"
