@@ -1,0 +1,58 @@
+{
+  "min_packer_version": "0.12.0",
+  "variables": {
+    "subscription_id": "{{env `ARM_SUBSCRIPTION_ID`}}",
+    "tenant_id": "{{env `ARM_TENANT_ID`}}",
+    "client_id": "{{env `ARM_CLIENT_ID`}}",
+    "client_secret": "{{env `ARM_CLIENT_SECRET`}}",
+    "azure_location": "West Europe",
+    "resource_group_name": "{{env `ARM_RESOURCE_GROUP`}}",
+    "consul_module_version": "master",
+    "consul_version": "1.2.0",
+    "nomad_version": "0.8.4"
+  },
+  "builders": [
+    {
+      "type": "azure-arm",
+      "subscription_id": "{{user `subscription_id`}}",
+      "tenant_id": "{{user `tenant_id`}}",
+      "client_id": "{{user `client_id`}}",
+      "client_secret": "{{user `client_secret`}}",
+      "managed_image_name": "nomad-consul-ubuntu-{{isotime \"2006-01-02-150405\"}}",
+      "managed_image_resource_group_name": "{{user `resource_group_name`}}",
+      "os_type": "Linux",
+      "image_publisher": "Canonical",
+      "image_offer": "UbuntuServer",
+      "image_sku": "16.04.0-LTS",
+      "location": "{{user `azure_location`}}",
+      "vm_size": "Standard_DS2_v2"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "{{template_dir}}/../../../terraform-azurerm-nomad",
+      "destination": "/tmp",
+      "pause_before": "30s"
+    },
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+      "inline_shebang": "/bin/sh -x",
+      "inline": [
+        "DEBIAN_FRONTEND=noninteractive apt-get -y upgrade",
+        "echo \"deb https://packages.microsoft.com/repos/azure-cli/ wheezy main\" | sudo tee /etc/apt/sources.list.d/azure-cli.list",
+        "curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -",
+        "curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg",
+        "mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg",
+        "sh -c 'echo \"deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-xenial-prod xenial main\" > /etc/apt/sources.list.d/dotnetdev.list'",
+        "apt-get update && apt-get install -y git azure-cli redis-tools dotnet-sdk-2.1.4",
+        "bash /tmp/terraform-azurerm-nomad/modules/install-nomad/install-nomad --version {{user `nomad_version`}}",
+        "git clone --branch {{user `consul_module_version`}} https://github.com/bondido/terraform-azurerm-consul.git /tmp/terraform-azurerm-consul",
+        "bash /tmp/terraform-azurerm-consul/modules/install-consul/install-consul --version {{user `consul_version`}}",
+        "curl -fsSL https://get.docker.com | sh",
+        "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
+      ]
+    }
+  ]
+}
